@@ -1,0 +1,31 @@
+export const Add_Employee="Add_Employee"
+export const Delete_Employee="Delete_Employee"
+export const Update_Employee="Update_Employee"
+export const Set_Search="Set_Search"
+export const Set_Page="Set_Page"
+export const Set_Sort="Set_Sort"
+
+export const addemployee=(employee)=>({
+    type:"Add_Employee",
+    payload:employee
+});
+export const deleteemployee=(id)=>({
+    type:"Delete_Employee",
+    payload:id
+})
+export const updateemployee=(employee)=>({
+    type:"Update_Employee",
+    payload:employee
+})
+export const Set_Search1=(search)=>({
+    type:"Set_Search",
+    payload:search
+})
+export const Setpage=(page)=>({
+    type:"Set_Page",
+    payload:page
+})
+export const Set_Sort1=(field)=>({
+    type:"Set_Sort",
+    payload:field
+})
