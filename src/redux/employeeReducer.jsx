@@ -1,4 +1,4 @@
-import { Add_Employee, Delete_Employee, Set_Search, Set_Page, Update_Employee, Set_Sort,Set_Employees} from "./employeeActions"
+import { Add_Employee, Delete_Employee, Set_Search, Set_Page, Update_Employee, Set_Sort,Set_Employees,Set_Show_All_Pages} from "./employeeActions"
 
 const initialState={
 //     record:[
@@ -61,13 +61,16 @@ const initialState={
     search:"",
     currentpage:1,
     sortfield:"",
-    sortOrder:"asc"
+    sortOrder:"asc",
+    total:0,
+    Set_Show_All_Pages:false
 }
 const employeeReducer=(state=initialState,actions)=>{
     switch(actions.type){
         case Set_Employees:
+            // for set employees we will set the record and also total because we are getting total from api response and we will use it for pagination
             return{
-                ...state,record:actions.payload
+                ...state,record:actions.payload.users,total:actions.payload.total
             }
         case Add_Employee:
             return{
@@ -101,6 +104,12 @@ const employeeReducer=(state=initialState,actions)=>{
                 sortfield:actions.payload,
                 sortOrder:order
             };
+
+            case Set_Show_All_Pages:
+                return {
+                    ...state,showallpages:!state.showallpages
+                }
+        
         default:
             return state
     }
