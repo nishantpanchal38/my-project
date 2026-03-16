@@ -4,6 +4,13 @@ export const Update_Employee="Update_Employee"
 export const Set_Search="Set_Search"
 export const Set_Page="Set_Page"
 export const Set_Sort="Set_Sort"
+export const Set_Employees="Set_Employees"
+
+export const setEmployees=(data)=>({
+    type:"Set_Employees",
+    payload:data
+})
+
 
 export const addemployee=(employee)=>({
     type:"Add_Employee",

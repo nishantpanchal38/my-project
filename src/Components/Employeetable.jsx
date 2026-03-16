@@ -1,7 +1,7 @@
-import React, { useState,useMemo } from "react";
+import React, { useState,useMemo, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { deleteemployee,Set_Search1, Set_Sort1,Setpage, updateemployee } from "../redux/employeeActions";
+import { deleteemployee,Set_Search1, Set_Sort1,setEmployees,Setpage, updateemployee } from "../redux/employeeActions";
 // import { EmployeeContext } from "./EmployeeContext";
 // import { useDispatch, useSelector } from "react-redux";
 // get the data from app.jsx like props..........
@@ -32,6 +32,29 @@ function EmployeeTable(
   // const {sortfield,sortOrder}=useSelector((state)=>state.employee)
 const sortfield=useSelector((state)=>state.sortfield)
 const sortOrder=useSelector((state)=>state.sortOrder)
+
+// for API........................................
+useEffect(()=>{
+  const getEmployees=async()=>{
+    try{
+        const response=await fetch("https://dummyjson.com/users?limit=100");
+        const data=await response.json();
+        // here we have to format the data because our data structure is different from the API data structure so we have to format it according to our data structure.........
+        const formattedData=data.users.map(item=>({
+          E_id: item.id,
+          name: item.firstName + " " + item.lastName,
+          email: item.email,
+          mobile: item.phone
+        }))
+        // console.log(data);
+        dispatch(setEmployees(formattedData))
+      }catch(error){
+        console.error("Error fetching employees:", error);
+      }
+  }
+  getEmployees();
+},[])
+
 
 // for redux portion .........................................................
 // const [search, setSearch] = useState("");
@@ -83,6 +106,8 @@ const sortOrder=useSelector((state)=>state.sortOrder)
         // const [sortOrder, setSortOrder] = useState("asc");
         
         // const handleSort = (field) => {
+//           console.log("record:", record);
+// console.log("type:", typeof record);
           
           const sortData = [...filteredRecords].sort((a, b) => {
             

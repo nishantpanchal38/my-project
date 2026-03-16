@@ -176,8 +176,11 @@ function Employeeform() {
 
             {/* this for provide validation users can-not enter above 10 digit */}
             <input
-              type="number"
+            // for mobile number we use type tel and pattern for validation and also we can use maxLength but it will not work in type number so we use this logic for validation
+              type="tel"
+              pattern="[0-9]{10}"
               placeholder="Enter Number"
+              required
               value={mobile}
               onChange={(e) => {const value=(e.target.value)
                 if (value.length!==10+1){
