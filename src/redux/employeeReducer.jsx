@@ -1,4 +1,4 @@
-import { Add_Employee, Delete_Employee, Set_Search, Set_Page, Update_Employee, Set_Sort,Set_Employees,Set_Show_All_Pages} from "./employeeActions"
+import { Add_Employee, Delete_Employee, Set_Search, Set_Page, Update_Employee, Set_Sort,Set_Employees,Set_Show_All_Pages,User_Login,User_Logout} from "./employeeActions"
 
 const initialState={
 //     record:[
@@ -63,7 +63,10 @@ const initialState={
     sortfield:"",
     sortOrder:"asc",
     total:0,
-    Set_Show_All_Pages:false
+    Set_Show_All_Pages:false,
+    user:JSON.parse(localStorage.getItem("user")) || null,
+    // for
+    isloggedIn: JSON.parse(localStorage.getItem("user")) ? true : false
 }
 const employeeReducer=(state=initialState,actions)=>{
     switch(actions.type){
@@ -109,6 +112,16 @@ const employeeReducer=(state=initialState,actions)=>{
                 return {
                     ...state,showallpages:!state.showallpages
                 }
+
+            case "User_Login":
+                return{
+                    ...state,user:actions.payload,isloggedIn:true
+                }
+
+                case "User_Logout":
+                    return{
+                        ...state,user:null,isloggedIn:false
+                    };
         
         default:
             return state

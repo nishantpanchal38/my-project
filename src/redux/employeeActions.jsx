@@ -6,6 +6,8 @@ export const Set_Page="Set_Page"
 export const Set_Sort="Set_Sort"
 export const Set_Employees="Set_Employees"
 export const Set_Show_All_Pages="Set_Show_All_Pages"
+export const User_Login="User_Login"
+export const User_Logout="User_Logout"
 
 export const setEmployees=(data)=>({
     type:"Set_Employees",
@@ -41,5 +43,18 @@ export const Set_Sort1=(field)=>({
 export const set_showallpages=()=>{
     return{
         type:"Set_Show_All_Pages"
+    }
+}
+
+export const userLogin=(user)=>{
+    return{
+        type:"User_Login",
+        payload:user
+    }
+};
+export const userLogout=()=>{
+    return{
+        type:"User_Logout",
+        payload:null
     }
 }

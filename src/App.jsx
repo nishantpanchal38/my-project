@@ -1,14 +1,19 @@
 
-import React, { useState } from "react";
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route, Link, Navigate, useNavigate } from "react-router-dom";
 
 import Employeeform from "./Components/Employeeform";
 import Employeetable from "./Components/Employeetable";
-import { useMemo } from "react";
+// import { useMemo } from "react";
+import LoginUser from "./Components/LoginUser";
+import UserRegister from "./Components/UserRegister";
+import { useSelector } from "react-redux";
+
 // import { EmployeeContext } from "./Components/EmployeeContext";
 
 
 function App() {
+
 
   
 
@@ -111,6 +116,16 @@ function App() {
   //   setRecords(updated);
   // };
 
+  
+  
+  // const [isloggedIn,setIsloggedIn]=useState(
+  //   localStorage.getItem("user")
+  // )
+  const isloggedIn=useSelector((state)=>state.isloggedIn)
+
+  
+  
+
   return (
     <BrowserRouter>
     {/* here we use context api..... from the EmployeeContext component */}
@@ -131,16 +146,33 @@ function App() {
       setSearch
     }} */}
     {/* > */}
-      <div className="flex gap-4 mb-4">
-        <Link to="/"><button className='bg-blue-400 px-4 py-2 rounded-lg text-white font-bold hover:bg-blue-600 transition duration-200'>Form</button></Link>
+      {isloggedIn && (
+        <div className="flex gap-4 mb-4">
+        <Link to="/"
+        className='bg-blue-400 px-4 py-2 rounded-lg text-white font-bold hover:bg-blue-600 transition duration-200'>SignUp</Link>
+        {/* <Link to="/register"></Link> */}
+        {/* <Link to="/form"><button className='bg-blue-400 px-4 py-2 rounded-lg text-white font-bold hover:bg-blue-600 transition duration-200'>Form</button></Link> */}
         <Link to="/table"><button className='bg-green-400 px-4 py-2 rounded-lg text-white font-bold hover:bg-green-600 transition duration-200'>Table</button></Link>
+
+
         
       </div>
+      )} 
 
       <Routes>
 
+
+        <Route 
+    path="/"
+    element={
+      <LoginUser />
+    }
+    ></Route>
+
+    <Route path="/register" element={<UserRegister />} />
+
         <Route
-          path="/"
+          path="/form"
           element={
             <Employeeform
             // record={record}
@@ -154,7 +186,9 @@ function App() {
         <Route
           path="/table"
           element={
+            isloggedIn ? 
             <Employeetable
+
               // record={record}
               // setRecords={setRecords}
               // handleDelete={handleDelete}
@@ -181,9 +215,9 @@ function App() {
               //   search,
               //   setSearch
               // }}
-            />
+            /> : <Navigate to="/" />
           }
-        />
+          />
         {/* for dynamic routing........... */}
         <Route
       path="/edit/:id"
@@ -199,6 +233,7 @@ function App() {
         />
       }
     />
+    
 
       </Routes>
       {/* </EmployeeContext.Provider> */}

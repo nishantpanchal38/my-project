@@ -1,7 +1,7 @@
 import React, { useState,useMemo, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { deleteemployee,Set_Search1, Set_Sort1,setEmployees,Setpage, updateemployee , set_showallpages} from "../redux/employeeActions";
+import { deleteemployee,Set_Search1, Set_Sort1,setEmployees,Setpage, updateemployee , set_showallpages, userLogout} from "../redux/employeeActions";
 // import { EmployeeContext } from "./EmployeeContext";
 // import { useDispatch, useSelector } from "react-redux";
 // get the data from app.jsx like props..........
@@ -20,13 +20,16 @@ function EmployeeTable(
   
 
   // recordsData,actions,pagination,searchprops
+
+  // for redux logout.........
+
 ) 
 
 {
+  const navigate=useNavigate()
   const record=useSelector((state)=>state.record);
   const search=useSelector((state)=>state.search);
   const currentpage=useSelector((state)=>state.currentpage)
-
   // const {sortfield,sortOrder}=useSelector((state)=>state.employee)
   const sortfield=useSelector((state)=>state.sortfield)
   const sortOrder=useSelector((state)=>state.sortOrder)
@@ -40,14 +43,86 @@ function EmployeeTable(
   const totalPages = Math.ceil(total / recordperpage);
   const pagesToShow=showallpages? totalPages:Math.min(5,totalPages)
   const dispatch=useDispatch();
+
   
   // for pagination we have to use total from api response because we are getting total from api response and we will use it for pagination.........
+          
+  // this is very very very important for check the token's behaviour is working or not means it expires or not....
+        //   useEffect(() => {
+        //   const interval = setInterval(async () => {
+        //   try {
+        //   const token = localStorage.getItem("accessToken");
+
+        //   const res = await fetch("https://dummyjson.com/auth/me", {
+        //     method: "GET",
+        //     headers: {
+        //       Authorization: `Bearer ${token}`,
+        //     },
+        //     // credentials: "include",
+        //   });
+        //   if(res.status===401){
+        //   console.log("Token Expired refreshing");
+        //   clearInterval(interval);
+        // } 
+        // const data = await res.json();
+        // console.log(data);
+
+        // } catch (error) {
+        //   console.error(error);
+        // }
+        // }, 30000);
+        // }, []);
+
+
   // for API........................................
   useEffect(()=>{
     const getEmployees=async()=>{
     const skip=(currentpage-1)*recordperpage
     try{
-        const response=await fetch(`https://dummyjson.com/users/search?q=${search}&limit=${recordperpage}&skip=${skip}`);
+      // 👉 You saved this at login
+      // 👉 Used to authenticate API request
+      let token=localStorage.getItem("accessToken")
+
+        const response=await fetch(`https://dummyjson.com/users/search?q=${search}&limit=${recordperpage}&skip=${skip}`,{
+          headers:{
+            Authorization: `Bearer ${token}`
+          }
+        });
+        if(response.status===401){
+          console.log("Token Expired refreshing")
+          
+          const refrshres= await fetch('https://dummyjson.com/auth/refresh',
+            {
+              method:"POST",
+              headers:{
+                "Content-Type":"application/json",
+              },
+              body:JSON.stringify({
+                refreshToken: localStorage.getItem("refreshToken")
+              })
+            }
+          )
+          const refershData=await refrshres.json()
+          // if refresh also fails.......
+          if(!refrshres.ok){
+            alert("Session expired , Login again")
+            localStorage.clear();
+            dispatch(userLogout());
+            navigate("/");
+            return;
+          }
+          // save new access token
+          localStorage.setItem("accessToken",refershData.accessToken)
+          // retry original API
+           response=await fetch(
+            `https://dummyjson.com/users/search?q=${search}&limit=${recordperpage}&skip=${skip}`,
+            {
+              headers:{
+                Authorization: `Bearer ${refershData.accessToken}`
+              }
+            }
+          )
+        }
         const data=await response.json();
         // here we have to format the data because our data structure is different from the API data structure so we have to format it according to our data structure.........
         const formattedData=data.users.map(item=>({
@@ -67,6 +142,16 @@ function EmployeeTable(
   }
   getEmployees();
 },[currentpage,search])
+
+// for logout button...
+// const navigate=navigate()
+const handlelogout=()=>{
+  localStorage.removeItem("user");
+  localStorage.removeItem("accessToken")
+  localStorage.removeItem("refreshToken")
+  dispatch(userLogout());
+  navigate("/")
+}
 
 
 // for redux portion .........................................................
@@ -107,7 +192,7 @@ function EmployeeTable(
       
       
       // use for navigation/redirect to the page 
-      const navigate = useNavigate();
+      // const navigate = useNavigate();
       
       // for search on button click
       const [searchInput, setSearchInput] = useState("");
@@ -141,6 +226,7 @@ function EmployeeTable(
             return 0;
           }
         );
+        
         // pagination logic
         // const recordperpage = 10;
           const indexOfLastRecord = currentpage * recordperpage;
@@ -174,6 +260,7 @@ function EmployeeTable(
 
       {/* Search Box */}
       <div className="flex items-center gap-2">
+        
     
       <input
       type="text"
@@ -188,6 +275,7 @@ function EmployeeTable(
       className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-200">
       Search
     </button>
+    
     </div>
     </div>
 
@@ -296,7 +384,7 @@ function EmployeeTable(
 
         {/* Pagination */}
 
-        <div className="mt-3">
+        <div className="mt-3 flex items-center">
 
           {Array.from({ length: pagesToShow }, (_, index) => (
 
@@ -322,7 +410,15 @@ function EmployeeTable(
             </button>
           )}
 
+          <button 
+          onClick={handlelogout}
+          className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-200 ml-auto"
+        >
+          Logout
+        </button>
+
         </div>
+        
 
       </div>
 
